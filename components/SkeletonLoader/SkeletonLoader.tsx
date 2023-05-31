@@ -12,7 +12,8 @@ const SkeletonLoader: FC<{ multiple?: boolean }> = ({ multiple }) => {
         base: 'repeat(1, 1fr)',
         sm: 'repeat(2, 1fr)',
         md: 'repeat(3, 1fr)',
-        xl: 'repeat(4, 1fr)',
+        lg: 'repeat(4, 1fr)',
+        xl: 'repeat(5, 1fr)',
       }}
       gap={6}
     >
