@@ -89,7 +89,7 @@ const Home: NextPage = () => {
 
   const handleScroll = (e): void => {
     const bottom = e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight;
-    if (!filters.length && bottom && nextPage) {
+    if (!filters.length && bottom && nextPage && !searchText) {
       void load(nextPage);
     }
   };
