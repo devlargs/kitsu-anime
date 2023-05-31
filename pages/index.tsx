@@ -14,7 +14,7 @@ import {
 } from '@chakra-ui/react';
 import SkeletonLoader from '@components/SkeletonLoader';
 import { API_URL } from '@constants/api';
-import { PLACEHOLDER_BLUR } from '@constants/images';
+import { POSTER_PLACEHOLDER_BLUR } from '@constants/images';
 import { STYLES } from '@constants/styles';
 import uniqBy from 'lodash/uniqBy';
 import { NextPage } from 'next';
@@ -22,19 +22,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { AiFillHeart, AiFillStar, AiOutlineHeart, AiOutlineSearch, AiOutlineStar } from 'react-icons/ai';
-
-type AnimeFilters = 'starred' | 'favorited';
-type AnimeData = {
-  id: string;
-  attributes: {
-    canonicalTitle: string;
-    posterImage: {
-      large: string;
-    };
-    averageRating: number;
-    popularityRank: number;
-  };
-};
+import { AnimeData, AnimeFilters } from 'types';
 
 const Home: NextPage = () => {
   const [data, setData] = useState<AnimeData[]>([]);
@@ -184,7 +172,7 @@ const Home: NextPage = () => {
                       height={780}
                       alt={item.attributes.canonicalTitle}
                       placeholder="blur"
-                      blurDataURL={PLACEHOLDER_BLUR}
+                      blurDataURL={POSTER_PLACEHOLDER_BLUR}
                     />
                     <Box p="10px">
                       <Link href={`/anime/${item.id}`}>
