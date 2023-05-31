@@ -1,4 +1,5 @@
 import { Box, chakra, List, ListIcon, ListItem, Spinner, Text } from '@chakra-ui/react';
+import { useRouter } from 'next/router';
 import { FC, useEffect, useState } from 'react';
 import { BsCheck2 } from 'react-icons/bs';
 import { EpisodeData } from 'types';
@@ -6,6 +7,34 @@ import { EpisodeData } from 'types';
 const EpisodeList: FC<{ link: string }> = ({ link }) => {
   const [data, setData] = useState<EpisodeData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [watched, setWatched] = useState({});
+  const router = useRouter();
+
+  const toggleWatched = (id: string): void => {
+    const animeId = router.query.id as string;
+    setWatched((prev) => {
+      const newWatched = { ...prev };
+      const animeWatched = newWatched[animeId] || [];
+
+      const index = animeWatched.indexOf(id);
+      if (index !== -1) {
+        animeWatched.splice(index, 1);
+      } else {
+        animeWatched.push(id);
+      }
+
+      newWatched[animeId] = animeWatched;
+      localStorage.setItem('watched', JSON.stringify(newWatched));
+      return newWatched;
+    });
+  };
+
+  useEffect(() => {
+    const localWatched = localStorage.getItem('watched');
+    if (localWatched) {
+      setWatched(JSON.parse(localWatched));
+    }
+  }, []);
 
   useEffect(() => {
     void (async (): Promise<void> => {
@@ -36,7 +65,19 @@ const EpisodeList: FC<{ link: string }> = ({ link }) => {
                 return (
                   <List spacing={3} key={index} fontSize="15px">
                     <ListItem mt="3px">
-                      <ListIcon as={BsCheck2} color="gray" />
+                      <ListIcon
+                        cursor="pointer"
+                        as={BsCheck2}
+                        fontSize="18px"
+                        color={
+                          watched[router.query.id as string]
+                            ? watched[router.query.id as string].includes(item.attributes.number)
+                              ? 'green.500'
+                              : 'lightgray'
+                            : 'lightgray'
+                        }
+                        onClick={(): void => toggleWatched(item.attributes.number)}
+                      />
                       {item.attributes.airdate}
                       <chakra.span ml="12px" />
                       {item.attributes.number}: {item.attributes.canonicalTitle || 'N/A'}

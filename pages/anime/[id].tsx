@@ -1,4 +1,4 @@
-import { Box, Flex, Text } from '@chakra-ui/react';
+import { Box, Flex, Spinner, Text } from '@chakra-ui/react';
 import CharactersCard from '@components/CharactersCard';
 import EpisodeList from '@components/EpisodeList';
 import { ANIME_URL_BY_ID } from '@constants/api';
@@ -17,15 +17,11 @@ import { formatCount } from 'utils/formatCount';
 const AnimeById: NextPage = () => {
   const router = useRouter();
   const [data, setData] = useState<AnimeAttributes | null>(null);
+  const [loading, setLoading] = useState(true);
   const [episodeLink, setEpisodeLink] = useState('');
   const [charactersLink, setCharactersLink] = useState('');
   const [starred, setStarred] = useState(false);
   const [favorited, setFavorited] = useState(false);
-
-  console.log({
-    starred,
-    favorited,
-  });
 
   useEffect(() => {
     const localStar = localStorage.getItem('starred');
@@ -65,6 +61,8 @@ const AnimeById: NextPage = () => {
         }
       } catch (ex) {
         console.error(ex); // eslint-disable-line
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -72,36 +70,28 @@ const AnimeById: NextPage = () => {
   }, [router.query.id]);
 
   const toggleAnime = (variant: AnimeFilters): void => {
+    const toggleStorageItem = (storageKey: string): void => {
+      const localItem = localStorage.getItem(storageKey);
+      if (localItem) {
+        const parsed = JSON.parse(localItem);
+        if (parsed.includes(router.query.id)) {
+          const filtered = parsed.filter((item: string) => item !== router.query.id);
+          localStorage.setItem(storageKey, JSON.stringify(filtered));
+        } else {
+          localStorage.setItem(storageKey, JSON.stringify([...parsed, router.query.id]));
+        }
+      }
+    };
+
     (variant === 'starred' ? setStarred : setFavorited)((prev) => !prev);
-    // console.log({
-    //   variant,
-    //   id: router.query.id,
-    // });
-    const localStar = localStorage.getItem('starred');
-    const localFavorite = localStorage.getItem('favorited');
-
-    if (localStar && variant === 'starred') {
-      const parsed = JSON.parse(localStar);
-      if (parsed.includes(router.query.id)) {
-        const filtered = parsed.filter((item: string) => item !== router.query.id);
-        localStorage.setItem('starred', JSON.stringify(filtered));
-      } else {
-        localStorage.setItem('starred', JSON.stringify([...parsed, router.query.id]));
-      }
-    }
-
-    if (localFavorite && variant === 'favorited') {
-      const parsed = JSON.parse(localFavorite);
-      if (parsed.includes(router.query.id)) {
-        const filtered = parsed.filter((item: string) => item !== router.query.id);
-        localStorage.setItem('favorited', JSON.stringify(filtered));
-      } else {
-        localStorage.setItem('favorited', JSON.stringify([...parsed, router.query.id]));
-      }
-    }
+    toggleStorageItem(variant === 'starred' ? variant : 'favorited');
   };
 
-  return (
+  return loading ? (
+    <Box display="grid" placeContent="center" h="200px">
+      <Spinner color="blue.500" size="lg" />
+    </Box>
+  ) : (
     <Box overflowY="auto" id="anime-list" h="calc(100vh - 60px)">
       {data && (
         <>
@@ -156,7 +146,7 @@ const AnimeById: NextPage = () => {
                   <Text ml="8px">Rank #{data.popularityRank}</Text>
                 </Flex>
                 <Text>
-                  Rated: {data.ageRating} ({data.ageRatingGuide})
+                  Rated: {data.ageRating} {data.ageRatingGuide}
                 </Text>
                 <Text>Aired on: {data.startDate}</Text>
                 <Text>{!data.endDate ? 'Ongoing' : `Ended on ${data.endDate}`}</Text>

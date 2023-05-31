@@ -45,7 +45,7 @@ const CharactersCard: FC<{ link: string }> = ({ link }) => {
         Characters
       </Text>
       {loading ? (
-        <Spinner />
+        <Spinner color="blue.500" />
       ) : (
         <Grid
           templateColumns={{
