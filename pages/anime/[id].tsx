@@ -1,8 +1,8 @@
-import { Box, Flex, Spinner, Text } from '@chakra-ui/react';
+import { Box, Fade, Flex, Spinner, Text } from '@chakra-ui/react';
 import CharactersCard from '@components/CharactersCard';
 import EpisodeList from '@components/EpisodeList';
 import { ANIME_URL_BY_ID } from '@constants/api';
-import { POSTER_PLACEHOLDER_BLUR } from '@constants/images';
+import { COVER_IMAGE_PLACEHOLDER_BLUR, POSTER_PLACEHOLDER_BLUR } from '@constants/images';
 import { STYLES } from '@constants/styles';
 import { NextPage } from 'next';
 import Image from 'next/image';
@@ -92,76 +92,85 @@ const AnimeById: NextPage = () => {
       <Spinner color="blue.500" size="lg" />
     </Box>
   ) : (
-    <Box overflowY="auto" id="anime-list" h="calc(100vh - 60px)">
-      {data && (
-        <>
-          <Image src={data.coverImage.large} alt={data.canonicalTitle} width={3360} height={800} />
+    <Fade in>
+      <Box overflowY="auto" id="anime-list" h="calc(100vh - 60px)">
+        {data && (
+          <>
+            <Image
+              src={data.coverImage.large}
+              alt={data.canonicalTitle}
+              width={3360}
+              height={800}
+              placeholder="blur"
+              blurDataURL={COVER_IMAGE_PLACEHOLDER_BLUR}
+            />
 
-          <Box px={STYLES.container.padding} my="2rem">
-            <Text textAlign="center" my="16px" fontSize="32px">
-              {data.canonicalTitle}
-            </Text>
+            <Box px={STYLES.container.padding} my="2rem">
+              <Text textAlign="center" my="16px" fontSize="32px">
+                {data.canonicalTitle}
+              </Text>
 
-            <Link href="/">
-              <Flex alignItems="center" gap="12px">
-                <BsChevronLeft />
-                <Text>Back</Text>
-              </Flex>
-            </Link>
+              <Link href="/">
+                <Flex alignItems="center" gap="12px">
+                  <BsChevronLeft />
+                  <Text>Back</Text>
+                </Flex>
+              </Link>
 
-            <Flex
-              mt="16px"
-              gap="20px"
-              flexDir={{
-                base: 'column',
-                lg: 'row',
-              }}
-            >
-              <Box width="300px" fontSize="14px" userSelect="none">
-                <Box boxShadow="rgba(0, 0, 0, 0.24) 0px 3px 8px">
-                  <Image
-                    style={{ borderRadius: '8px' }}
-                    src={data.posterImage.large}
-                    width={550}
-                    height={780}
-                    alt={data.canonicalTitle}
-                    placeholder="blur"
-                    blurDataURL={POSTER_PLACEHOLDER_BLUR}
-                  />
-                </Box>
-                <Flex alignItems="center" mt="16px">
-                  <Box cursor="pointer" onClick={(): void => toggleAnime('favorited')}>
-                    {!favorited ? <AiOutlineHeart color="#1A365D" /> : <AiFillHeart color="#1A365D" />}
+              <Flex
+                mt="16px"
+                gap="20px"
+                flexDir={{
+                  base: 'column',
+                  lg: 'row',
+                }}
+              >
+                <Box width="300px" fontSize="14px" userSelect="none">
+                  <Box boxShadow="rgba(0, 0, 0, 0.24) 0px 3px 8px">
+                    <Image
+                      style={{ borderRadius: '8px' }}
+                      src={data.posterImage.large}
+                      width={550}
+                      height={780}
+                      alt={data.canonicalTitle}
+                      placeholder="blur"
+                      blurDataURL={POSTER_PLACEHOLDER_BLUR}
+                    />
                   </Box>
+                  <Flex alignItems="center" mt="16px">
+                    <Box cursor="pointer" onClick={(): void => toggleAnime('favorited')}>
+                      {!favorited ? <AiOutlineHeart color="#1A365D" /> : <AiFillHeart color="#1A365D" />}
+                    </Box>
+                    <Text>
+                      {data.averageRating} from {formatCount(data.userCount, 1)} users
+                    </Text>
+                  </Flex>
+
+                  <Flex alignItems="center">
+                    <Box cursor="pointer" onClick={(): void => toggleAnime('starred')}>
+                      {starred ? <AiFillStar color="#1A365D" /> : <AiOutlineStar color="#1A365D" />}
+                    </Box>
+                    <Text>{data.favoritesCount}</Text>
+                    <Text ml="8px">Rank #{data.popularityRank}</Text>
+                  </Flex>
                   <Text>
-                    {data.averageRating} from {formatCount(data.userCount, 1)} users
+                    Rated: {data.ageRating} {data.ageRatingGuide}
                   </Text>
-                </Flex>
-
-                <Flex alignItems="center">
-                  <Box cursor="pointer" onClick={(): void => toggleAnime('starred')}>
-                    {starred ? <AiFillStar color="#1A365D" /> : <AiOutlineStar color="#1A365D" />}
-                  </Box>
-                  <Text>{data.favoritesCount}</Text>
-                  <Text ml="8px">Rank #{data.popularityRank}</Text>
-                </Flex>
-                <Text>
-                  Rated: {data.ageRating} {data.ageRatingGuide}
-                </Text>
-                <Text>Aired on: {data.startDate}</Text>
-                <Text>{!data.endDate ? 'Ongoing' : `Ended on ${data.endDate}`}</Text>
-                <Text>Type: {data.subtype}</Text>
-              </Box>
-              <Box flex="1">
-                <Text>{data.description}</Text>
-                {charactersLink && <CharactersCard link={charactersLink} />}
-                {episodeLink && <EpisodeList link={episodeLink} />}
-              </Box>
-            </Flex>
-          </Box>
-        </>
-      )}
-    </Box>
+                  <Text>Aired on: {data.startDate}</Text>
+                  <Text>{!data.endDate ? 'Ongoing' : `Ended on ${data.endDate}`}</Text>
+                  <Text>Type: {data.subtype}</Text>
+                </Box>
+                <Box flex="1">
+                  <Text>{data.description}</Text>
+                  {charactersLink && <CharactersCard link={charactersLink} />}
+                  {episodeLink && <EpisodeList link={episodeLink} />}
+                </Box>
+              </Flex>
+            </Box>
+          </>
+        )}
+      </Box>
+    </Fade>
   );
 };
 

@@ -1,4 +1,5 @@
 import { Box, Grid, GridItem, Spinner, Text } from '@chakra-ui/react';
+import { CHARACTER_PLACEHOLDER_BLUR } from '@constants/images';
 import Image from 'next/image';
 import { FC, useEffect, useState } from 'react';
 import { CharactersData } from 'types';
@@ -69,6 +70,8 @@ const CharactersCard: FC<{ link: string }> = ({ link }) => {
                       width={500}
                       alt={attributes.canonicalName}
                       style={{ objectFit: 'cover' }}
+                      placeholder="blur"
+                      blurDataURL={CHARACTER_PLACEHOLDER_BLUR}
                     />
                     <Box p={4} maxH="70px">
                       <Text>{attributes.canonicalName}</Text>
