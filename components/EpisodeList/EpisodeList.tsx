@@ -1,4 +1,5 @@
 import { Box, chakra, Fade, List, ListIcon, ListItem, Spinner, Text } from '@chakra-ui/react';
+import axios from 'axios';
 import { useRouter } from 'next/router';
 import { FC, useEffect, useState } from 'react';
 import { BsCheck2 } from 'react-icons/bs';
@@ -39,9 +40,8 @@ const EpisodeList: FC<{ link: string }> = ({ link }) => {
   useEffect(() => {
     void (async (): Promise<void> => {
       try {
-        const res = await fetch(link);
-        const json = await res.json();
-        setData(json.data);
+        const { data } = await axios.get(link);
+        setData(data.data);
       } catch (ex) {
         console.error(ex); // eslint-disable-line
       } finally {

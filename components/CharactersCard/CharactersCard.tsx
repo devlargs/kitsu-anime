@@ -1,8 +1,10 @@
 import { Box, Fade, Grid, GridItem, Spinner, Text } from '@chakra-ui/react';
 import { CHARACTER_PLACEHOLDER_BLUR } from '@constants/images';
+import axios from 'axios';
 import Image from 'next/image';
 import { FC, useEffect, useState } from 'react';
 import { CharactersData } from 'types';
+import { truncateString } from 'utils/truncateString';
 
 const CharactersCard: FC<{ link: string }> = ({ link }) => {
   const [characters, setCharacters] = useState<CharactersData[] | null>(null);
@@ -12,15 +14,15 @@ const CharactersCard: FC<{ link: string }> = ({ link }) => {
     try {
       if (link) {
         void (async (): Promise<void> => {
-          const res = await fetch(link);
-          const json = await res.json();
-          const requests = json.data.map((item) => {
-            return fetch(item.relationships.character.links.related);
+          const { data } = await axios.get(link);
+
+          const requests = data.data.map((item) => {
+            return axios.get(item.relationships.character.links.related);
           });
 
           Promise.all(requests)
             .then((response) => {
-              return Promise.all(response.map((res) => res.json()));
+              return Promise.all(response.map((res) => res.data));
             })
             .then((data) => {
               setCharacters(data);
@@ -83,7 +85,7 @@ const CharactersCard: FC<{ link: string }> = ({ link }) => {
                         className="character-image"
                       />
                       <Box p={4} maxH="70px">
-                        <Text>{attributes.canonicalName}</Text>
+                        <Text>{truncateString(attributes.canonicalName)}</Text>
                       </Box>
                     </GridItem>
                   );

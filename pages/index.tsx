@@ -16,6 +16,7 @@ import SkeletonLoader from '@components/SkeletonLoader';
 import { API_URL } from '@constants/api';
 import { POSTER_PLACEHOLDER_BLUR } from '@constants/images';
 import { STYLES } from '@constants/styles';
+import axios from 'axios';
 import uniqBy from 'lodash/uniqBy';
 import { NextPage } from 'next';
 import Image from 'next/image';
@@ -37,10 +38,9 @@ const Home: NextPage = () => {
   const load = async (url: string): Promise<void> => {
     try {
       setLoading(true);
-      const res = await fetch(url);
-      const json = await res.json();
-      setNextPage(json.links.next);
-      setData((prev) => uniqBy([...prev, ...json.data], 'id'));
+      const { data } = await axios.get(url);
+      setNextPage(data.links.next);
+      setData((prev) => uniqBy([...prev, ...data.data], 'id'));
       setFilters([]);
       setSearchText('');
     } catch (ex) {

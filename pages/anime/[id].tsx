@@ -4,6 +4,7 @@ import EpisodeList from '@components/EpisodeList';
 import { ANIME_URL_BY_ID } from '@constants/api';
 import { COVER_IMAGE_PLACEHOLDER_BLUR, POSTER_PLACEHOLDER_BLUR } from '@constants/images';
 import { STYLES } from '@constants/styles';
+import axios from 'axios';
 import { NextPage } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -44,20 +45,19 @@ const AnimeById: NextPage = () => {
 
   useEffect(() => {
     const load = async (): Promise<void> => {
-      const response = await fetch(ANIME_URL_BY_ID + router.query.id);
-      const json = await response.json();
+      const { data: details } = await axios.get(ANIME_URL_BY_ID + router.query.id);
 
-      if (json.data?.attributes) {
-        setData(json.data.attributes);
+      if (details.data?.attributes) {
+        setData(details.data.attributes);
       }
 
       try {
-        if (json.data?.relationships?.episodes?.links?.related) {
-          setEpisodeLink(json.data.relationships.episodes.links.related);
+        if (details.data?.relationships?.episodes?.links?.related) {
+          setEpisodeLink(details.data.relationships.episodes.links.related);
         }
 
-        if (json.data?.relationships?.characters?.links?.related) {
-          setCharactersLink(json.data.relationships.characters.links.related);
+        if (details.data?.relationships?.characters?.links?.related) {
+          setCharactersLink(details.data.relationships.characters.links.related);
         }
       } catch (ex) {
         console.error(ex); // eslint-disable-line
@@ -129,7 +129,7 @@ const AnimeById: NextPage = () => {
                   lg: 'row',
                 }}
               >
-                <Box width="300px" fontSize="14px" userSelect="none">
+                <Box width="300px" fontSize="16px" userSelect="none">
                   <Box boxShadow="rgba(0, 0, 0, 0.24) 0px 3px 8px">
                     <Image
                       style={{ borderRadius: '8px' }}
