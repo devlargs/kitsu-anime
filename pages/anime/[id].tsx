@@ -82,6 +82,8 @@ const AnimeById: NextPage = () => {
         } else {
           localStorage.setItem(storageKey, JSON.stringify([...parsed, router.query.id]));
         }
+      } else {
+        localStorage.setItem(storageKey, JSON.stringify([router.query.id]));
       }
     };
 
