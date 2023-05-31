@@ -28,6 +28,13 @@ export type EpisodeAttributes = {
   id: string;
 };
 
+export type CharactersAttributes = {
+  canonicalName: string;
+  image?: {
+    original: string;
+  };
+};
+
 export type AnimeFilters = 'starred' | 'favorited';
 
 export type AnimeData = {
@@ -37,4 +44,10 @@ export type AnimeData = {
 
 export type EpisodeData = {
   attributes: EpisodeAttributes;
+};
+
+export type CharactersData = {
+  data: {
+    attributes: CharactersAttributes;
+  };
 };

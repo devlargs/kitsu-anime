@@ -1,4 +1,5 @@
 import { Box, Flex, Text } from '@chakra-ui/react';
+import CharactersCard from '@components/CharactersCard';
 import EpisodeList from '@components/EpisodeList';
 import { ANIME_URL_BY_ID } from '@constants/api';
 import { POSTER_PLACEHOLDER_BLUR } from '@constants/images';
@@ -17,12 +18,12 @@ const AnimeById: NextPage = () => {
   const router = useRouter();
   const [data, setData] = useState<AnimeAttributes | null>(null);
   const [episodeLink, setEpisodeLink] = useState('');
+  const [charactersLink, setCharactersLink] = useState('');
 
   useEffect(() => {
     const load = async (): Promise<void> => {
       const response = await fetch(ANIME_URL_BY_ID + router.query.id);
       const json = await response.json();
-      console.log(json);
       setData(json.data.attributes);
 
       try {
@@ -30,9 +31,9 @@ const AnimeById: NextPage = () => {
           setEpisodeLink(json.data.relationships.episodes.links.related);
         }
 
-        // if (json.data.relationships.characters.links.related) {
-        //   console.log(json.data.relationships.characters.links.related);
-        // }
+        if (json.data.relationships.characters.links.related) {
+          setCharactersLink(json.data.relationships.characters.links.related);
+        }
       } catch (ex) {
         console.error(ex); // eslint-disable-line
       }
@@ -46,6 +47,7 @@ const AnimeById: NextPage = () => {
       {data && (
         <>
           <Image src={data.coverImage.large} alt={data.canonicalTitle} width={3360} height={800} />
+
           <Box px={STYLES.container.padding} my="2rem">
             <Text textAlign="center" my="16px" fontSize="32px">
               {data.canonicalTitle}
@@ -58,17 +60,26 @@ const AnimeById: NextPage = () => {
               </Flex>
             </Link>
 
-            <Flex mt="16px" gap="20px">
+            <Flex
+              mt="16px"
+              gap="20px"
+              flexDir={{
+                base: 'column',
+                lg: 'row',
+              }}
+            >
               <Box width="300px" fontSize="14px">
-                <Image
-                  style={{ borderRadius: '8px' }}
-                  src={data.posterImage.large}
-                  width={550}
-                  height={780}
-                  alt={data.canonicalTitle}
-                  placeholder="blur"
-                  blurDataURL={POSTER_PLACEHOLDER_BLUR}
-                />
+                <Box boxShadow="rgba(0, 0, 0, 0.24) 0px 3px 8px">
+                  <Image
+                    style={{ borderRadius: '8px' }}
+                    src={data.posterImage.large}
+                    width={550}
+                    height={780}
+                    alt={data.canonicalTitle}
+                    placeholder="blur"
+                    blurDataURL={POSTER_PLACEHOLDER_BLUR}
+                  />
+                </Box>
                 <Flex alignItems="center" mt="16px">
                   <AiFillHeart color="#1A365D" />{' '}
                   <Text>
@@ -91,6 +102,7 @@ const AnimeById: NextPage = () => {
               </Box>
               <Box flex="1">
                 <Text>{data.description}</Text>
+                {charactersLink && <CharactersCard link={charactersLink} />}
                 {episodeLink && <EpisodeList link={episodeLink} />}
               </Box>
             </Flex>
