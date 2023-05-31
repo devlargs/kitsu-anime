@@ -109,7 +109,7 @@ const AnimeById: NextPage = () => {
               blurDataURL={COVER_IMAGE_PLACEHOLDER_BLUR}
             />
 
-            <Box px={STYLES.container.padding} my="2rem">
+            <Box px={STYLES.container.padding} py="2rem" maxW="1440px" margin="auto">
               <Text textAlign="center" my="16px" fontSize="32px">
                 {data.canonicalTitle}
               </Text>

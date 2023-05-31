@@ -4,6 +4,7 @@ export const THEME = extendTheme({
   styles: {
     global: () => ({
       'html, body': {
+        backgroundImage: '#F5F5F5',
         '#anime-list::-webkit-scrollbar-track': {
           WebkitBoxShadow: 'inset 0 0 3px rgba(0,0,0,0.3)',
           backgroundColor: '#F5F5F5',

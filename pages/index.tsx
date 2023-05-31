@@ -105,7 +105,7 @@ const Home: NextPage = () => {
   }, []);
 
   return (
-    <Box px={STYLES.container.padding} my="2rem">
+    <Box px={STYLES.container.padding} py="2rem" maxW="1440px" margin="auto">
       <Text textAlign="center" fontSize="32px" mb="32px">
         Anime List
       </Text>
@@ -158,7 +158,8 @@ const Home: NextPage = () => {
                 base: 'repeat(1, 1fr)',
                 sm: 'repeat(2, 1fr)',
                 md: 'repeat(3, 1fr)',
-                xl: 'repeat(4, 1fr)',
+                lg: 'repeat(4, 1fr)',
+                xl: 'repeat(5, 1fr)',
               }}
               gap={6}
             >
