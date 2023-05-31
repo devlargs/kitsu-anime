@@ -69,12 +69,18 @@ const Home: NextPage = () => {
     return data.filter((item) => {
       const isSearchMatch = item.attributes.canonicalTitle.toLowerCase().includes(searchText.toLowerCase());
 
-      if (filters.includes('starred')) {
-        return isSearchMatch && starred.includes(item.id);
+      if (filters.length === 1) {
+        if (filters.includes('starred')) {
+          return isSearchMatch && starred.includes(item.id);
+        }
+
+        if (filters.includes('favorited')) {
+          return isSearchMatch && favorited.includes(item.id);
+        }
       }
 
-      if (filters.includes('favorited')) {
-        return isSearchMatch && favorited.includes(item.id);
+      if (filters.length === 2) {
+        return isSearchMatch && starred.includes(item.id) && favorited.includes(item.id);
       }
 
       return isSearchMatch;
