@@ -1,4 +1,4 @@
-# NextJS, Typescript, Chakra UI Boilerplate
+# NextJS, Typescript, Chakra UI
 
 A simple repository that bootstraps application. npm packages will be updated from time to time.
 
