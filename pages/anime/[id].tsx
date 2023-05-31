@@ -9,9 +9,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { AiFillHeart, AiFillStar } from 'react-icons/ai';
+import { AiFillHeart, AiFillStar, AiOutlineHeart, AiOutlineStar } from 'react-icons/ai';
 import { BsChevronLeft } from 'react-icons/bs';
-import { AnimeAttributes } from 'types';
+import { AnimeAttributes, AnimeFilters } from 'types';
 import { formatCount } from 'utils/formatCount';
 
 const AnimeById: NextPage = () => {
@@ -19,19 +19,48 @@ const AnimeById: NextPage = () => {
   const [data, setData] = useState<AnimeAttributes | null>(null);
   const [episodeLink, setEpisodeLink] = useState('');
   const [charactersLink, setCharactersLink] = useState('');
+  const [starred, setStarred] = useState(false);
+  const [favorited, setFavorited] = useState(false);
+
+  console.log({
+    starred,
+    favorited,
+  });
+
+  useEffect(() => {
+    const localStar = localStorage.getItem('starred');
+    const localFavorite = localStorage.getItem('favorited');
+
+    const id = router.query.id;
+
+    if (localStar) {
+      if (JSON.parse(localStar).includes(id)) {
+        setStarred(true);
+      }
+    }
+
+    if (localFavorite) {
+      if (JSON.parse(localFavorite).includes(id)) {
+        setFavorited(true);
+      }
+    }
+  }, [router]);
 
   useEffect(() => {
     const load = async (): Promise<void> => {
       const response = await fetch(ANIME_URL_BY_ID + router.query.id);
       const json = await response.json();
-      setData(json.data.attributes);
+
+      if (json.data?.attributes) {
+        setData(json.data.attributes);
+      }
 
       try {
-        if (json.data.relationships.episodes.links.related) {
+        if (json.data?.relationships?.episodes?.links?.related) {
           setEpisodeLink(json.data.relationships.episodes.links.related);
         }
 
-        if (json.data.relationships.characters.links.related) {
+        if (json.data?.relationships?.characters?.links?.related) {
           setCharactersLink(json.data.relationships.characters.links.related);
         }
       } catch (ex) {
@@ -41,6 +70,36 @@ const AnimeById: NextPage = () => {
 
     void load();
   }, [router.query.id]);
+
+  const toggleAnime = (variant: AnimeFilters): void => {
+    (variant === 'starred' ? setStarred : setFavorited)((prev) => !prev);
+    // console.log({
+    //   variant,
+    //   id: router.query.id,
+    // });
+    const localStar = localStorage.getItem('starred');
+    const localFavorite = localStorage.getItem('favorited');
+
+    if (localStar && variant === 'starred') {
+      const parsed = JSON.parse(localStar);
+      if (parsed.includes(router.query.id)) {
+        const filtered = parsed.filter((item: string) => item !== router.query.id);
+        localStorage.setItem('starred', JSON.stringify(filtered));
+      } else {
+        localStorage.setItem('starred', JSON.stringify([...parsed, router.query.id]));
+      }
+    }
+
+    if (localFavorite && variant === 'favorited') {
+      const parsed = JSON.parse(localFavorite);
+      if (parsed.includes(router.query.id)) {
+        const filtered = parsed.filter((item: string) => item !== router.query.id);
+        localStorage.setItem('favorited', JSON.stringify(filtered));
+      } else {
+        localStorage.setItem('favorited', JSON.stringify([...parsed, router.query.id]));
+      }
+    }
+  };
 
   return (
     <Box overflowY="auto" id="anime-list" h="calc(100vh - 60px)">
@@ -68,7 +127,7 @@ const AnimeById: NextPage = () => {
                 lg: 'row',
               }}
             >
-              <Box width="300px" fontSize="14px">
+              <Box width="300px" fontSize="14px" userSelect="none">
                 <Box boxShadow="rgba(0, 0, 0, 0.24) 0px 3px 8px">
                   <Image
                     style={{ borderRadius: '8px' }}
@@ -81,18 +140,21 @@ const AnimeById: NextPage = () => {
                   />
                 </Box>
                 <Flex alignItems="center" mt="16px">
-                  <AiFillHeart color="#1A365D" />{' '}
+                  <Box cursor="pointer" onClick={(): void => toggleAnime('favorited')}>
+                    {!favorited ? <AiOutlineHeart color="#1A365D" /> : <AiFillHeart color="#1A365D" />}
+                  </Box>
                   <Text>
                     {data.averageRating} from {formatCount(data.userCount, 1)} users
                   </Text>
                 </Flex>
-                {/* {false && <AiOutlineHeart color="#1A365D" />} */}
+
                 <Flex alignItems="center">
-                  <AiFillStar color="#1A365D" />
+                  <Box cursor="pointer" onClick={(): void => toggleAnime('starred')}>
+                    {starred ? <AiFillStar color="#1A365D" /> : <AiOutlineStar color="#1A365D" />}
+                  </Box>
                   <Text>{data.favoritesCount}</Text>
                   <Text ml="8px">Rank #{data.popularityRank}</Text>
                 </Flex>
-                {/* {false && <AiOutlineStar color="#1A365D" />} */}
                 <Text>
                   Rated: {data.ageRating} ({data.ageRatingGuide})
                 </Text>

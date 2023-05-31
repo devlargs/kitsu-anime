@@ -32,11 +32,11 @@ const EpisodeList: FC<{ link: string }> = ({ link }) => {
         ) : (
           <>
             {data.length ? (
-              data.map((item) => {
+              data.map((item, index) => {
                 return (
-                  <List spacing={3} key={item.attributes.id} fontSize="15px">
+                  <List spacing={3} key={index} fontSize="15px">
                     <ListItem mt="3px">
-                      <ListIcon as={BsCheck2} color="green.500" />
+                      <ListIcon as={BsCheck2} color="gray" />
                       {item.attributes.airdate}
                       <chakra.span ml="12px" />
                       {item.attributes.number}: {item.attributes.canonicalTitle || 'N/A'}
