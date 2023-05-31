@@ -1,4 +1,18 @@
-import { Box, Flex, Grid, GridItem, Input, InputGroup, InputLeftElement, Spinner, Text } from '@chakra-ui/react';
+import {
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  Box,
+  Fade,
+  Flex,
+  Grid,
+  GridItem,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  Text,
+} from '@chakra-ui/react';
+import SkeletonLoader from '@components/SkeletonLoader';
 import { API_URL } from '@constants/api';
 import { PLACEHOLDER_BLUR } from '@constants/images';
 import { STYLES } from '@constants/styles';
@@ -23,12 +37,13 @@ type AnimeData = {
 
 const Home: NextPage = () => {
   const [data, setData] = useState<AnimeData[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [, setNextPage] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [nextPage, setNextPage] = useState('');
   const [searchText, setSearchText] = useState('');
   const [filters, setFilters] = useState<AnimeFilters[]>([]);
   const [starred, setStarred] = useState<string[]>([]);
   const [favorited, setFavorited] = useState<string[]>([]);
+  const [initialLoad, setInitialLoad] = useState(true);
 
   const load = async (url: string): Promise<void> => {
     try {
@@ -40,9 +55,10 @@ const Home: NextPage = () => {
       setFilters([]);
       setSearchText('');
     } catch (ex) {
-      console.error(ex);
+      console.error(ex); // eslint-disable-line
     } finally {
       setLoading(false);
+      setInitialLoad(false);
     }
   };
 
@@ -75,6 +91,13 @@ const Home: NextPage = () => {
       return isSearchMatch;
     });
   }, [searchText, data, filters, favorited, starred]);
+
+  const handleScroll = (e): void => {
+    const bottom = e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight;
+    if (!filters.length && bottom && nextPage) {
+      void load(nextPage);
+    }
+  };
 
   useEffect(() => {
     void load(API_URL);
@@ -132,84 +155,97 @@ const Home: NextPage = () => {
         <Text fontSize="20px">{filteredData.length} Results</Text>
       </Flex>
 
-      <Box overflowY="scroll" h="calc(100vh - 292px)" id="anime-list" px={2}>
+      <Box overflowY="auto" h="calc(100vh - 292px)" id="anime-list" px={2} onScroll={handleScroll}>
         {filteredData.length ? (
-          <Grid
-            templateColumns={{
-              base: 'repeat(1, 1fr)',
-              sm: 'repeat(2, 1fr)',
-              md: 'repeat(3, 1fr)',
-              xl: 'repeat(4, 1fr)',
-            }}
-            gap={6}
-          >
-            {filteredData.map((item) => {
-              return (
-                <GridItem
-                  w="100%"
-                  bg="blue.700"
-                  key={item.id}
-                  boxShadow="rgba(0, 0, 0, 0.24) 0px 3px 8px"
-                  borderRadius="8"
-                >
-                  <Image
-                    style={{ borderTopLeftRadius: '8px', borderTopRightRadius: '8px' }}
-                    src={item.attributes.posterImage.large}
-                    width={550}
-                    height={780}
-                    alt={item.attributes.canonicalTitle}
-                    placeholder="blur"
-                    blurDataURL={PLACEHOLDER_BLUR}
-                  />
-                  <Box p="10px">
-                    <Text
-                      color="white"
-                      h="48px"
-                      fontSize={{
-                        base: '13px',
-                        md: '16px',
-                      }}
-                    >
-                      {item.attributes.canonicalTitle}
-                    </Text>
-                    <Flex
-                      justifyContent="space-between"
-                      fontSize={{
-                        base: '13px',
-                        md: '16px',
-                      }}
-                    >
-                      <Flex alignItems="center" gap="4px">
-                        <Box onClick={(): void => toggleAnime('starred', item.id)} cursor="pointer">
-                          {starred.includes(item.id) ? <AiFillStar color="white" /> : <AiOutlineStar color="white" />}
-                        </Box>
-                        <Text color="white">{item.attributes.averageRating}</Text>
+          <Fade in>
+            <Grid
+              templateColumns={{
+                base: 'repeat(1, 1fr)',
+                sm: 'repeat(2, 1fr)',
+                md: 'repeat(3, 1fr)',
+                xl: 'repeat(4, 1fr)',
+              }}
+              gap={6}
+            >
+              {filteredData.map((item) => {
+                return (
+                  <GridItem
+                    w="100%"
+                    bg="blue.700"
+                    key={item.id}
+                    boxShadow="rgba(0, 0, 0, 0.24) 0px 3px 8px"
+                    borderRadius="8"
+                  >
+                    <Image
+                      style={{ borderTopLeftRadius: '8px', borderTopRightRadius: '8px' }}
+                      src={item.attributes.posterImage.large}
+                      width={550}
+                      height={780}
+                      alt={item.attributes.canonicalTitle}
+                      placeholder="blur"
+                      blurDataURL={PLACEHOLDER_BLUR}
+                    />
+                    <Box p="10px">
+                      <Text
+                        color="white"
+                        h="48px"
+                        fontSize={{
+                          base: '13px',
+                          md: '16px',
+                        }}
+                      >
+                        {item.attributes.canonicalTitle}
+                      </Text>
+                      <Flex
+                        justifyContent="space-between"
+                        fontSize={{
+                          base: '13px',
+                          md: '16px',
+                        }}
+                      >
+                        <Flex alignItems="center" gap="4px">
+                          <Box onClick={(): void => toggleAnime('starred', item.id)} cursor="pointer">
+                            {starred.includes(item.id) ? <AiFillStar color="white" /> : <AiOutlineStar color="white" />}
+                          </Box>
+                          <Text color="white">{item.attributes.averageRating}</Text>
+                        </Flex>
+                        <Flex alignItems="center" gap="4px">
+                          <Box onClick={(): void => toggleAnime('favorited', item.id)} cursor="pointer">
+                            {favorited.includes(item.id) ? (
+                              <AiFillHeart color="white" />
+                            ) : (
+                              <AiOutlineHeart color="white" />
+                            )}
+                          </Box>
+                          <Text color="white">{item.attributes.popularityRank}</Text>
+                        </Flex>
                       </Flex>
-                      <Flex alignItems="center" gap="4px">
-                        <Box onClick={(): void => toggleAnime('favorited', item.id)} cursor="pointer">
-                          {favorited.includes(item.id) ? (
-                            <AiFillHeart color="white" />
-                          ) : (
-                            <AiOutlineHeart color="white" />
-                          )}
-                        </Box>
-                        <Text color="white">{item.attributes.popularityRank}</Text>
-                      </Flex>
-                    </Flex>
-                  </Box>
-                </GridItem>
-              );
-            })}
-          </Grid>
+                    </Box>
+                  </GridItem>
+                );
+              })}
+
+              {loading && (
+                <>
+                  {Array.from({ length: 10 }).map((_, i) => {
+                    return <SkeletonLoader key={i} />;
+                  })}
+                </>
+              )}
+            </Grid>
+          </Fade>
         ) : (
-          <p>No data</p>
+          <>
+            {!loading && (
+              <Alert status="error">
+                <AlertIcon />
+                <AlertTitle>No results found</AlertTitle>
+              </Alert>
+            )}
+          </>
         )}
 
-        {loading && (
-          <Box>
-            <Spinner />
-          </Box>
-        )}
+        {initialLoad && <SkeletonLoader multiple />}
       </Box>
     </Box>
   );
