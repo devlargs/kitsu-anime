@@ -3,7 +3,7 @@ export type AnimeAttributes = {
   posterImage: {
     large: string;
   };
-  coverImage: {
+  coverImage?: {
     large: string;
   };
   averageRating: number;

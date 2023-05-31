@@ -66,7 +66,9 @@ const AnimeById: NextPage = () => {
       }
     };
 
-    void load();
+    if (router.query.id) {
+      void load();
+    }
   }, [router.query.id]);
 
   const toggleAnime = (variant: AnimeFilters): void => {
@@ -97,7 +99,7 @@ const AnimeById: NextPage = () => {
         {data && (
           <>
             <Image
-              src={data.coverImage.large}
+              src={data.coverImage?.large || '/cover-image-placeholder.jpg'}
               alt={data.canonicalTitle}
               width={3360}
               height={800}

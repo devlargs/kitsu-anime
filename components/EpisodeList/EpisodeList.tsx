@@ -1,4 +1,4 @@
-import { Box, chakra, List, ListIcon, ListItem, Spinner, Text } from '@chakra-ui/react';
+import { Box, chakra, Fade, List, ListIcon, ListItem, Spinner, Text } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import { FC, useEffect, useState } from 'react';
 import { BsCheck2 } from 'react-icons/bs';
@@ -59,7 +59,7 @@ const EpisodeList: FC<{ link: string }> = ({ link }) => {
         {loading ? (
           <Spinner color="blue.500" />
         ) : (
-          <>
+          <Fade in>
             {data.length ? (
               data.map((item, index) => {
                 return (
@@ -88,7 +88,7 @@ const EpisodeList: FC<{ link: string }> = ({ link }) => {
             ) : (
               <>No data found</>
             )}
-          </>
+          </Fade>
         )}
       </>
     </Box>

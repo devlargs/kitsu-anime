@@ -1,4 +1,4 @@
-import { Box, Grid, GridItem, Spinner, Text } from '@chakra-ui/react';
+import { Box, Fade, Grid, GridItem, Spinner, Text } from '@chakra-ui/react';
 import { CHARACTER_PLACEHOLDER_BLUR } from '@constants/images';
 import Image from 'next/image';
 import { FC, useEffect, useState } from 'react';
@@ -48,42 +48,52 @@ const CharactersCard: FC<{ link: string }> = ({ link }) => {
       {loading ? (
         <Spinner color="blue.500" />
       ) : (
-        <Grid
-          templateColumns={{
-            base: 'repeat(1, 1fr)',
-            sm: 'repeat(2, 1fr)',
-            md: 'repeat(3, 1fr)',
-            lg: 'repeat(4, 1fr)',
-            xl: 'repeat(5, 1fr)',
-            '2xl': 'repeat(6, 1fr)',
-          }}
-          gap={6}
-        >
-          {characters?.length ? (
-            characters.map(({ data: { attributes } }, i) => {
-              if (i !== 0) {
-                return (
-                  <GridItem w="100%" key={attributes.canonicalName} boxShadow="rgba(0, 0, 0, 0.24) 0px 3px 8px">
-                    <Image
-                      src={attributes.image?.original ?? '/placeholder.png'}
-                      height={600}
-                      width={500}
-                      alt={attributes.canonicalName}
-                      style={{ objectFit: 'cover' }}
-                      placeholder="blur"
-                      blurDataURL={CHARACTER_PLACEHOLDER_BLUR}
-                    />
-                    <Box p={4} maxH="70px">
-                      <Text>{attributes.canonicalName}</Text>
-                    </Box>
-                  </GridItem>
-                );
-              }
-            })
-          ) : (
-            <></>
-          )}
-        </Grid>
+        <Fade in>
+          <Grid
+            templateColumns={{
+              base: 'repeat(1, 1fr)',
+              sm: 'repeat(2, 1fr)',
+              md: 'repeat(3, 1fr)',
+              lg: 'repeat(4, 1fr)',
+              xl: 'repeat(5, 1fr)',
+              '2xl': 'repeat(6, 1fr)',
+            }}
+            gap={6}
+          >
+            {characters?.length ? (
+              characters.map(({ data: { attributes } }, i) => {
+                if (i !== 0) {
+                  return (
+                    <GridItem
+                      w="100%"
+                      key={attributes.canonicalName}
+                      boxShadow="rgba(0, 0, 0, 0.24) 0px 3px 8px"
+                      flexDir="column"
+                      justifyContent="space-between"
+                      display="flex"
+                    >
+                      <Image
+                        src={attributes.image?.original ?? '/placeholder.png'}
+                        height={600}
+                        width={500}
+                        alt={attributes.canonicalName}
+                        style={{ objectFit: 'cover' }}
+                        placeholder="blur"
+                        blurDataURL={CHARACTER_PLACEHOLDER_BLUR}
+                        className="character-image"
+                      />
+                      <Box p={4} maxH="70px">
+                        <Text>{attributes.canonicalName}</Text>
+                      </Box>
+                    </GridItem>
+                  );
+                }
+              })
+            ) : (
+              <></>
+            )}
+          </Grid>
+        </Fade>
       )}
     </Box>
   );
