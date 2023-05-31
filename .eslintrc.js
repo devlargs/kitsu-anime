@@ -27,7 +27,7 @@ module.exports = {
     'react-hooks/exhaustive-deps': 'warn',
     'react/prop-types': 'off',
     '@typescript-eslint/no-unused-vars': ['error', { ignoreRestSiblings: true }],
-    'no-console': 'error',
+    'no-console': 'warn',
     'react/react-in-jsx-scope': 'off',
     'react/display-name': 'off',
     'react/no-unescaped-entities': 'off',

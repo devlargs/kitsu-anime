@@ -1,3 +1,6 @@
 module.exports = {
-  reactStrictMode: true,
+  reactStrictMode: false,
+  images: {
+    domains: ['media.kitsu.io'],
+  },
 };
