@@ -19,6 +19,7 @@ import { STYLES } from '@constants/styles';
 import uniqBy from 'lodash/uniqBy';
 import { NextPage } from 'next';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { AiFillHeart, AiFillStar, AiOutlineHeart, AiOutlineSearch, AiOutlineStar } from 'react-icons/ai';
 
@@ -186,16 +187,24 @@ const Home: NextPage = () => {
                       blurDataURL={PLACEHOLDER_BLUR}
                     />
                     <Box p="10px">
-                      <Text
-                        color="white"
-                        h="48px"
-                        fontSize={{
-                          base: '13px',
-                          md: '16px',
-                        }}
-                      >
-                        {item.attributes.canonicalTitle}
-                      </Text>
+                      <Link href={`/anime/${item.id}`}>
+                        <Text
+                          h="48px"
+                          color="white"
+                          fontSize={{
+                            base: '13px',
+                            md: '16px',
+                          }}
+                          cursor="pointer"
+                          transition="0.5s ease-in-out"
+                          _hover={{
+                            color: 'blue.100',
+                          }}
+                        >
+                          {item.attributes.canonicalTitle}
+                        </Text>
+                      </Link>
+
                       <Flex
                         justifyContent="space-between"
                         fontSize={{
